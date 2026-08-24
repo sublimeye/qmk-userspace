@@ -1,0 +1,12 @@
+# QMK build output
+.build/
+*.elf
+*.bin
+*.hex
+*.uf2
+
+# ...but the firmware backups ARE the safety net. Never ignore them.
+!backup/*.hex
+
+# macOS
+.DS_Store
