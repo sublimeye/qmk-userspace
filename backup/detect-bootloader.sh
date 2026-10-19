@@ -11,9 +11,9 @@ for i in $(seq 1 200); do
   if ioreg -p IOUSB -l 2>/dev/null | grep -qi usbasp; then
     echo "[poll $i] *** USBasp VISIBLE IN USB TREE ***"
   fi
-  if avrdude -c usbasp -p m328p -n 2>&1 | grep -qi "signature"; then
+  if avrdude -v -c usbasp -p m328p -n 2>&1 | grep -qi "device signature"; then
     echo "=== BOOTLOADER DETECTED on poll $i ==="
-    avrdude -c usbasp -p m328p -n 2>&1 | grep -iE "signature|processor|Error|warning" | head -8
+    avrdude -v -c usbasp -p m328p -n 2>&1 | grep -iE "signature|processor|Error|warning" | head -8
     exit 0
   fi
   sleep 3
