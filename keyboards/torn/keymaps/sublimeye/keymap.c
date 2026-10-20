@@ -54,3 +54,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+
+// Hold both thumb layer keys (Esc -> _SYM, Space -> _NAV) to get _NUM.
+// Recovered from the chip: layer_state_set at dump offset 0x1D80 sets bit 4
+// when bits 2 and 3 are both on, and clears it otherwise.
+layer_state_t layer_state_set_user(layer_state_t state) {
+    return update_tri_layer_state(state, _SYM, _NAV, _NUM);
+}
