@@ -6,7 +6,7 @@ QMK [External Userspace](https://docs.qmk.fm/newbs_external_userspace) for my
 
 ## Build
 
-Needs Docker and a checkout of `qmk/qmk_firmware` (`$QMK_HOME`):
+Needs Docker and a checkout of `qmk/qmk_firmware` (`$QMK_HOME`; built against commit `180f394b`):
 
 ```sh
 docker run --rm -v "$QMK_HOME":/qmk_firmware -v "$PWD":/userspace -w /userspace \
@@ -57,6 +57,11 @@ LEFT:   MEDIA  Hyper  Esc/SYM  Lang (Ctrl+Space)  |  FN  Space/NAV  NUM  F1 (Sup
 - zsh: `bindkey '^[[3;3~' kill-word` (Option+Fwd-Delete deletes the next word).
 
 ## Changelog
+
+### v3.2 (2026-10-20)
+
+- NAV: with Cmd held, the Home key (Q) types Q, so Cmd+Tab → Q quits the selected app
+  while Space is still held.
 
 ### v3.1 (2026-10-19)
 

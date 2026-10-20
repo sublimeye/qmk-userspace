@@ -66,6 +66,26 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_
     return is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode) ? FLOW_TAP_TERM : 0;
 }
 
+// Cmd+Tab is Cmd + Space(Nav)+H. With Space still held, Q is Home, so quitting an app
+// from the switcher would send Cmd+Home. While Cmd is held, Nav's Home types Q instead.
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    static bool home_is_q = false;
+    if (keycode == KC_HOME) {
+        if (record->event.pressed) {
+            home_is_q = get_mods() & MOD_MASK_GUI;
+        }
+        if (home_is_q) {
+            if (record->event.pressed) {
+                register_code(KC_Q);
+            } else {
+                unregister_code(KC_Q);
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
 // Hold both thumb layer keys (Esc -> _SYM, Space -> _NAV) to get _NUM.
 // Only drop _NUM if this function turned it on, so the dedicated MO(_NUM)
 // thumb key also works (update_tri_layer_state() would cancel it at once).
