@@ -95,6 +95,8 @@ raw HID channel open.
 - Key usage stream for the Mac logger (`keylog.c`, `logger/`). One 8-byte packet per
   key event, sent from the main loop only when the USB endpoint is free; typing never
   waits. Off unless the logger asks for it.
+- Packets are padded up to a 32-byte HID report (macOS won't deliver a short one).
+- Flashed and verified streaming 2026-10-20.
 
 ### v3.3 (2026-10-20)
 
