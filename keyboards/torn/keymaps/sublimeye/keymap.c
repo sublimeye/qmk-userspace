@@ -53,11 +53,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 // Flow Tap: a tap-hold key pressed within FLOW_TAP_TERM of the previous key is a tap,
 // so home-row mods don't fire while typing fast. Not for the thumb layer keys, so
-// Space can still be held for Nav straight after a word.
+// Space can still be held for Nav straight after a word, and not for Shift, so a
+// capital right after a space or mid-word ("and I", camelCase) isn't typed as "di".
 uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
     switch (keycode) {
         case LT(_NAV, KC_SPC):
         case LT(_SYM, KC_ESC):
+        case LSFT_T(KC_D):
+        case RSFT_T(KC_K):
             return 0;
     }
     return is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode) ? FLOW_TAP_TERM : 0;

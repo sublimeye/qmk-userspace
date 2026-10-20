@@ -58,6 +58,11 @@ LEFT:   MEDIA  Hyper  Esc/SYM  Lang (Ctrl+Space)  |  FN  Space/NAV  NUM  F1 (Sup
 
 ## Changelog
 
+### v3.1 (2026-10-19)
+
+- Flow Tap no longer applies to the Shift home-row keys (D, K): with it, a capital typed
+  within 150 ms of the previous key came out lowercase ("and I" → "and di").
+
 ### v3 (2026-10-19)
 
 - Caps Word replaces Caps Lock (top-left).
