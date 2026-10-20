@@ -48,6 +48,38 @@ Thumb row, outer to inner, then inner to outer:
 LEFT:   MEDIA  Hyper  Esc/SYM  Lang/NUM (tap Ctrl+Space)  |  FN  Space/NAV  F1 (Superwhisper)  (free)  :RIGHT
 ```
 
+## Key usage logger (v4)
+
+The firmware can stream every key event (which physical key, which layer, tap or hold,
+press/release time) to the Mac over VIA's raw HID channel; `logger/torn_logger.py`
+counts them. Only aggregates are saved: per-key counts, tap/hold lengths, press gaps,
+and **same-finger** key pairs (which the finger analysis needs). The full ordered
+sequence of keystrokes is never stored, so typed text and passwords cannot be
+reconstructed from the files.
+The stream is off at power-up; the script turns it on and repeats that every 10 s;
+the firmware stops sending 2 minutes after the last repeat.
+
+Caveat: while the keyboard is plugged in, any program running as you can send the same
+raw HID command and read the live key stream (it maps to letters via the VIA keymap).
+That is a property of the raw HID channel, not just this logger; macOS asks for no
+extra permission because the interface is vendor-defined. The exposure is only while
+something is actively streaming. `logger/uninstall.sh` stops the daemon; unplugging the
+board ends it entirely.
+
+```sh
+logger/install.sh        # venv + launchd agent (starts at login) + `torn-logger` command
+torn-logger live         # refreshing view: daemon/keyboard/firmware health, today's top keys
+torn-logger status       # one-shot health check (exit code 0 = all good)
+torn-logger report       # summary of all days; --days 7 for the last week
+torn-logger watch        # debug: print raw events (stop the daemon first, see below)
+logger/uninstall.sh      # stop and remove the agent; data is kept
+```
+
+Data: `~/.local/share/torn-logger/days/YYYY-MM-DD.json`, daemon log `daemon.log` there.
+Stop/start the daemon: `launchctl bootout gui/$(id -u)/com.sublimeye.torn-logger` /
+`logger/install.sh`. VIA (usevia.app) can't connect while the daemon runs: it has the
+raw HID channel open.
+
 ## Mac setup the keymap relies on
 
 - **Language key** sends Ctrl+Space: enable System Settings → Keyboard → Keyboard
@@ -57,6 +89,12 @@ LEFT:   MEDIA  Hyper  Esc/SYM  Lang/NUM (tap Ctrl+Space)  |  FN  Space/NAV  F1 (
 - zsh: `bindkey '^[[3;3~' kill-word` (Option+Fwd-Delete deletes the next word).
 
 ## Changelog
+
+### v4 (2026-10-20)
+
+- Key usage stream for the Mac logger (`keylog.c`, `logger/`). One 8-byte packet per
+  key event, sent from the main loop only when the USB endpoint is free; typing never
+  waits. Off unless the logger asks for it.
 
 ### v3.3 (2026-10-20)
 

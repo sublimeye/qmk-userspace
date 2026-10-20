@@ -7,7 +7,9 @@
 // (F1), screenshot (F12) and emoji picker; ' is back on the right outer column.
 // v3.3: Caps Word moved to the Caps Lock spot, left of A; top-left is free.
 // Language key: tap switches input source, hold for Num. Superwhisper (F1) moved next to Space; outer right thumb free.
+// v4: key usage stream for the Mac logger (keylog.c, logger/).
 #include QMK_KEYBOARD_H
+#include "keylog.h"
 
 enum torn_layers { _QWERTY, _SYM, _NAV, _NUM, _MEDIA, _FN };
 
@@ -77,6 +79,7 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_
 // from the switcher would send Cmd+Home. While Cmd is held, Nav's Home types Q instead.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static bool home_is_q = false;
+    keylog_record(keycode, record);
     if (keycode == LANG_NUM && record->tap.count) {
         if (record->event.pressed) {
             tap_code16(C(KC_SPC));

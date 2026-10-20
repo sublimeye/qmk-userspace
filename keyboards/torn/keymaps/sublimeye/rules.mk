@@ -6,3 +6,6 @@ EXTRAKEY_ENABLE = yes
 # keymap.c is only the default it starts from (and resets to).
 VIA_ENABLE = yes
 CAPS_WORD_ENABLE = yes
+
+# v4: key usage stream to the Mac over VIA's raw HID endpoint (keylog.c).
+SRC += keylog.c
