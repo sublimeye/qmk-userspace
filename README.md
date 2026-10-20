@@ -35,28 +35,38 @@ firmware, see [`backup/RESTORE.md`](backup/RESTORE.md).
 
 | Layer | How | What |
 |---|---|---|
-| QWERTY | default | Home-row mods: Ctrl/Alt/Shift/Cmd on A S D F and J K L ; |
+| QWERTY | default | Home-row mods: Ctrl/Alt/Shift/Cmd on A S D F and J K L ;. Top-left: Caps Word. Right outer column: F12 (screenshot), ', emoji picker |
 | SYM | hold Esc (left thumb) | Symbols |
 | NAV | hold Space (right thumb) | Arrows, word jumps, Home/PgUp/PgDn/End on Q W E R, deletes on N M , . / |
-| NUM | hold Num key, or Esc + Space together | Numpad on the right hand |
+| NUM | hold Esc + Space together (the Num thumb key is a dead switch) | Numpad on the right hand |
 | MEDIA | hold left outer thumb | Volume, play, prev/next, brightness |
 | FN | hold right inner thumb | F1–F12 |
 
 Thumb row, outer to inner, then inner to outer:
 
 ```
-LEFT:   MEDIA  Hyper  Esc/SYM  Lang (Ctrl+Space)  |  FN  Space/NAV  NUM  (empty)  :RIGHT
+LEFT:   MEDIA  Hyper  Esc/SYM  Lang (Ctrl+Space)  |  FN  Space/NAV  NUM  F1 (Superwhisper)  :RIGHT
 ```
 
 ## Mac setup the keymap relies on
 
 - **Language key** sends Ctrl+Space: enable System Settings → Keyboard → Keyboard
-  Shortcuts → Input Sources → "Select the previous input source".
+  Shortcuts → Input Sources → "Select next source in Input menu" (Ctrl+Space).
 - **Nav deletes in iTerm** (Settings → Keys → Key Bindings):
   ⌘⌫ → Send Hex Codes `0x15`; ⌥⌦ → Send Escape Sequence `d`.
 - zsh: `bindkey '^[[3;3~' kill-word` (Option+Fwd-Delete deletes the next word).
 
 ## Changelog
+
+### v3 (2026-10-19)
+
+- Caps Word replaces Caps Lock (top-left).
+- NAV: Redo (Cmd+Shift+Z) on B, next to undo/cut/copy/paste.
+- Flow Tap (`FLOW_TAP_TERM 150`): fast typing never triggers home-row mods. The Space
+  and Esc thumb keys are exempt so they can be held right after a word.
+- Speculative Hold: Shift/Ctrl home-row mods apply on press (Shift-click works).
+- Right outer column: F12 (macOS area screenshot to clipboard), `'` back, Ctrl+Cmd+Space
+  (emoji picker). Right outer thumb: F1 (Superwhisper). Same keys as the laptop.
 
 ### v2 (2026-10-19)
 

@@ -3,6 +3,8 @@
 // flash dump (backup/torn-2026-10-19-flash.hex, offset 0x6C) and compiles to the
 // same bytes. Since then: Colemak layer removed, outer right column cleared,
 // Home/PgUp/PgDn/End on Nav, one-key input-source switch, Num key fixed.
+// v3: Caps Word, Redo on Nav, Flow Tap, Speculative Hold, outer keys for Superwhisper
+// (F1), screenshot (F12) and emoji picker; ' is back on the right outer column.
 #include QMK_KEYBOARD_H
 
 enum torn_layers { _QWERTY, _SYM, _NAV, _NUM, _MEDIA, _FN };
@@ -10,10 +12,10 @@ enum torn_layers { _QWERTY, _SYM, _NAV, _NUM, _MEDIA, _FN };
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT_split_3x6_4(
-    KC_CAPS,          KC_Q,             KC_W,             KC_E,             KC_R,             KC_T,               KC_Y,             KC_U,             KC_I,             KC_O,             KC_P,             _______,
-    _______,          LCTL_T(KC_A),     LALT_T(KC_S),     LSFT_T(KC_D),     LGUI_T(KC_F),     KC_G,               KC_H,             RGUI_T(KC_J),     RSFT_T(KC_K),     RALT_T(KC_L),     RCTL_T(KC_SCLN),  _______,
-    _______,          KC_Z,             KC_X,             KC_C,             KC_V,             KC_B,               KC_N,             KC_M,             KC_COMM,          KC_DOT,           KC_SLSH,          _______,
-                                        MO(_MEDIA),       HYPR(XXXXXXX),    LT(_SYM, KC_ESC), LCTL(KC_SPC),       MO(_FN),          LT(_NAV, KC_SPC), MO(_NUM),         _______
+    CW_TOGG,          KC_Q,             KC_W,             KC_E,             KC_R,             KC_T,               KC_Y,             KC_U,             KC_I,             KC_O,             KC_P,             KC_F12,
+    _______,          LCTL_T(KC_A),     LALT_T(KC_S),     LSFT_T(KC_D),     LGUI_T(KC_F),     KC_G,               KC_H,             RGUI_T(KC_J),     RSFT_T(KC_K),     RALT_T(KC_L),     RCTL_T(KC_SCLN),  KC_QUOT,
+    _______,          KC_Z,             KC_X,             KC_C,             KC_V,             KC_B,               KC_N,             KC_M,             KC_COMM,          KC_DOT,           KC_SLSH,          C(G(KC_SPC)),
+                                        MO(_MEDIA),       HYPR(XXXXXXX),    LT(_SYM, KC_ESC), LCTL(KC_SPC),       MO(_FN),          LT(_NAV, KC_SPC), MO(_NUM),         KC_F1
 ),
 [_SYM] = LAYOUT_split_3x6_4(
     _______,          LSFT(KC_1),       LSFT(KC_2),       LSFT(KC_3),       LSFT(KC_4),       LSFT(KC_5),         LSFT(KC_6),       LSFT(KC_7),       LSFT(KC_8),       LSFT(KC_EQL),     _______,          _______,
@@ -24,7 +26,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_NAV] = LAYOUT_split_3x6_4(
     _______,          KC_HOME,          KC_PGUP,          KC_PGDN,          KC_END,           _______,            _______,          LALT(KC_LEFT),    KC_UP,            LALT(KC_RGHT),    SGUI(KC_GRV),     _______,
     _______,          KC_LCTL,          KC_LALT,          KC_LSFT,          KC_LGUI,          _______,            KC_TAB,           KC_LEFT,          KC_DOWN,          KC_RGHT,          KC_ENT,           _______,
-    _______,          LGUI(KC_Z),       LGUI(KC_X),       LGUI(KC_C),       LGUI(KC_V),       _______,            LGUI(KC_BSPC),    KC_BSPC,          LALT(KC_BSPC),    KC_DEL,           LALT(KC_DEL),     LCTL(KC_K),
+    _______,          LGUI(KC_Z),       LGUI(KC_X),       LGUI(KC_C),       LGUI(KC_V),       SGUI(KC_Z),         LGUI(KC_BSPC),    KC_BSPC,          LALT(KC_BSPC),    KC_DEL,           LALT(KC_DEL),     LCTL(KC_K),
                                         _______,          _______,          _______,          _______,            _______,          _______,          _______,          _______
 ),
 [_NUM] = LAYOUT_split_3x6_4(
@@ -48,6 +50,18 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+
+// Flow Tap: a tap-hold key pressed within FLOW_TAP_TERM of the previous key is a tap,
+// so home-row mods don't fire while typing fast. Not for the thumb layer keys, so
+// Space can still be held for Nav straight after a word.
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_keycode) {
+    switch (keycode) {
+        case LT(_NAV, KC_SPC):
+        case LT(_SYM, KC_ESC):
+            return 0;
+    }
+    return is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode) ? FLOW_TAP_TERM : 0;
+}
 
 // Hold both thumb layer keys (Esc -> _SYM, Space -> _NAV) to get _NUM.
 // Only drop _NUM if this function turned it on, so the dedicated MO(_NUM)

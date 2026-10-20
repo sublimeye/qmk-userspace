@@ -5,3 +5,4 @@ EXTRAKEY_ENABLE = yes
 # Edit keys live with the VIA app (usevia.app). VIA keeps the keymap in EEPROM;
 # keymap.c is only the default it starts from (and resets to).
 VIA_ENABLE = yes
+CAPS_WORD_ENABLE = yes
