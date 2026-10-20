@@ -8,3 +8,6 @@
 #define QUICK_TAP_TERM 0
 // 2021 IGNORE_MOD_TAP_INTERRUPT is gone: its behaviour has been the default since 2023-05.
 // RETRO_TAPPING stays off.
+
+// VIA stores 4 layers by default; this keymap has 7 (7 x 48 keys x 2 B = 672 B of the 1 KB EEPROM).
+#define DYNAMIC_KEYMAP_LAYER_COUNT 7
