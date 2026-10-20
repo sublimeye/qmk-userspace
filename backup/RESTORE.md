@@ -45,10 +45,13 @@ Alternatively, clear it and let QMK repopulate defaults rather than restoring it
 |---|---|
 | `torn-2026-10-19-flash.hex` | **Authoritative.** Byte-exact dump read off the chip — literally the firmware that was running. |
 | `torn-2026-10-19-eeprom.hex` | EEPROM dump from the same session. |
-| `torn-2026-10-19-rebuild-from-2021-src.hex` | Secondary. Rebuilt from the 2021 source in the era-correct Docker toolchain. Use only if the dump is unusable. |
+| `decoded-keymap-from-chip.txt` | Human-readable decode of the keymap table in the flash dump (7 layers). |
 
-If the dump and the rebuild differ, **the dump wins** — it is what was actually on the
-keyboard. See the README history for why they might differ.
+The dump is the only copy of the original firmware: its source was lost (the
+`sublimeye/qmk_firmware` fork's `kinesish` keymap turned out to be someone else's,
+not what was on the chip). A 2021-toolchain rebuild of the recovered keymap is not
+byte-identical to the dump — the original was compiled with a different avr-gcc — so
+there is no secondary restore image. **Restore from the dump.**
 
 ## Hardware facts worth not re-deriving
 
