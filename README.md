@@ -35,17 +35,17 @@ firmware, see [`backup/RESTORE.md`](backup/RESTORE.md).
 
 | Layer | How | What |
 |---|---|---|
-| QWERTY | default | Home-row mods: Ctrl/Alt/Shift/Cmd on A S D F and J K L ;. Top-left: Caps Word. Right outer column: F12 (screenshot), ', emoji picker |
+| QWERTY | default | Home-row mods: Ctrl/Alt/Shift/Cmd on A S D F and J K L ;. Left of A (the Caps Lock spot): Caps Word. Right outer column: F12 (screenshot), ', emoji picker |
 | SYM | hold Esc (left thumb) | Symbols |
 | NAV | hold Space (right thumb) | Arrows, word jumps, Home/PgUp/PgDn/End on Q W E R, deletes on N M , . / |
-| NUM | hold Esc + Space together (the Num thumb key is a dead switch) | Numpad on the right hand |
+| NUM | hold the language key (left inner thumb), or Esc + Space together | Numpad on the right hand |
 | MEDIA | hold left outer thumb | Volume, play, prev/next, brightness |
 | FN | hold right inner thumb | F1–F12 |
 
 Thumb row, outer to inner, then inner to outer:
 
 ```
-LEFT:   MEDIA  Hyper  Esc/SYM  Lang (Ctrl+Space)  |  FN  Space/NAV  NUM  F1 (Superwhisper)  :RIGHT
+LEFT:   MEDIA  Hyper  Esc/SYM  Lang/NUM (tap Ctrl+Space)  |  FN  Space/NAV  F1 (Superwhisper)  (free)  :RIGHT
 ```
 
 ## Mac setup the keymap relies on
@@ -57,6 +57,14 @@ LEFT:   MEDIA  Hyper  Esc/SYM  Lang (Ctrl+Space)  |  FN  Space/NAV  NUM  F1 (Sup
 - zsh: `bindkey '^[[3;3~' kill-word` (Option+Fwd-Delete deletes the next word).
 
 ## Changelog
+
+### v3.3 (2026-10-20)
+
+- Caps Word moved from top-left to the Caps Lock spot (left of A). Top-left is free.
+- Language key (left inner thumb): tap still switches input source, hold is NUM. Numbers
+  now take one thumb on the opposite hand. Esc + Space still works.
+- Superwhisper (F1) moved from the outer right thumb to the key next to Space (old NUM
+  key, switch now replaced). Outer right thumb is free.
 
 ### v3.2 (2026-10-20)
 

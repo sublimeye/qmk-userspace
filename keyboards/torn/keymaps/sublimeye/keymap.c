@@ -5,17 +5,23 @@
 // Home/PgUp/PgDn/End on Nav, one-key input-source switch, Num key fixed.
 // v3: Caps Word, Redo on Nav, Flow Tap, Speculative Hold, outer keys for Superwhisper
 // (F1), screenshot (F12) and emoji picker; ' is back on the right outer column.
+// v3.3: Caps Word moved to the Caps Lock spot, left of A; top-left is free.
+// Language key: tap switches input source, hold for Num. Superwhisper (F1) moved next to Space; outer right thumb free.
 #include QMK_KEYBOARD_H
 
 enum torn_layers { _QWERTY, _SYM, _NAV, _NUM, _MEDIA, _FN };
 
+// Tap: Ctrl+Space (macOS input-source switch). Hold: _NUM. LT can only tap a plain
+// key, so KC_SPC is a placeholder; process_record_user sends Ctrl+Space instead.
+#define LANG_NUM LT(_NUM, KC_SPC)
+
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT_split_3x6_4(
-    CW_TOGG,          KC_Q,             KC_W,             KC_E,             KC_R,             KC_T,               KC_Y,             KC_U,             KC_I,             KC_O,             KC_P,             KC_F12,
-    _______,          LCTL_T(KC_A),     LALT_T(KC_S),     LSFT_T(KC_D),     LGUI_T(KC_F),     KC_G,               KC_H,             RGUI_T(KC_J),     RSFT_T(KC_K),     RALT_T(KC_L),     RCTL_T(KC_SCLN),  KC_QUOT,
+    _______,          KC_Q,             KC_W,             KC_E,             KC_R,             KC_T,               KC_Y,             KC_U,             KC_I,             KC_O,             KC_P,             KC_F12,
+    CW_TOGG,          LCTL_T(KC_A),     LALT_T(KC_S),     LSFT_T(KC_D),     LGUI_T(KC_F),     KC_G,               KC_H,             RGUI_T(KC_J),     RSFT_T(KC_K),     RALT_T(KC_L),     RCTL_T(KC_SCLN),  KC_QUOT,
     _______,          KC_Z,             KC_X,             KC_C,             KC_V,             KC_B,               KC_N,             KC_M,             KC_COMM,          KC_DOT,           KC_SLSH,          C(G(KC_SPC)),
-                                        MO(_MEDIA),       HYPR(XXXXXXX),    LT(_SYM, KC_ESC), LCTL(KC_SPC),       MO(_FN),          LT(_NAV, KC_SPC), MO(_NUM),         KC_F1
+                                        MO(_MEDIA),       HYPR(XXXXXXX),    LT(_SYM, KC_ESC), LANG_NUM,           MO(_FN),          LT(_NAV, KC_SPC), KC_F1,            _______
 ),
 [_SYM] = LAYOUT_split_3x6_4(
     _______,          LSFT(KC_1),       LSFT(KC_2),       LSFT(KC_3),       LSFT(KC_4),       LSFT(KC_5),         LSFT(KC_6),       LSFT(KC_7),       LSFT(KC_8),       LSFT(KC_EQL),     _______,          _______,
@@ -59,6 +65,7 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_
     switch (keycode) {
         case LT(_NAV, KC_SPC):
         case LT(_SYM, KC_ESC):
+        case LANG_NUM:
         case LSFT_T(KC_D):
         case RSFT_T(KC_K):
             return 0;
@@ -70,6 +77,12 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record, uint16_t prev_
 // from the switcher would send Cmd+Home. While Cmd is held, Nav's Home types Q instead.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static bool home_is_q = false;
+    if (keycode == LANG_NUM && record->tap.count) {
+        if (record->event.pressed) {
+            tap_code16(C(KC_SPC));
+        }
+        return false;
+    }
     if (keycode == KC_HOME) {
         if (record->event.pressed) {
             home_is_q = get_mods() & MOD_MASK_GUI;
@@ -87,8 +100,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 // Hold both thumb layer keys (Esc -> _SYM, Space -> _NAV) to get _NUM.
-// Only drop _NUM if this function turned it on, so the dedicated MO(_NUM)
-// thumb key also works (update_tri_layer_state() would cancel it at once).
+// Only drop _NUM if this function turned it on, so holding the language key
+// also works (update_tri_layer_state() would cancel it at once).
 layer_state_t layer_state_set_user(layer_state_t state) {
     static bool tri_num = false;
     const layer_state_t both = ((layer_state_t)1 << _SYM) | ((layer_state_t)1 << _NAV);
