@@ -21,11 +21,15 @@ Output: `torn_sublimeye.hex` (gitignored).
 1. Plug the board straight into the Mac (no hub).
 2. Hold **BOOT**, tap **RESET**, release **BOOT**. `backup/detect-bootloader.sh` (read-only) confirms it is visible.
 3. `avrdude -p m328p -c usbasp -U flash:w:torn_sublimeye.hex:i`
-4. Tap **RESET** to start the new firmware.
+4. If `keymap.c` changed, also blank the EEPROM (still in the bootloader):
+   `head -c 1024 /dev/zero | LC_ALL=C tr '\0' '\377' > blank.bin && avrdude -p m328p -c usbasp -D -U eeprom:w:blank.bin:r`
+5. Tap **RESET** to start the new firmware.
 
-Every new build resets the VIA-edited keymap in EEPROM back to `keymap.c`, so
-permanent changes go in `keymap.c`. To go back to the original 2021 firmware, see
-[`backup/RESTORE.md`](backup/RESTORE.md).
+VIA keeps its keymap in EEPROM and only reloads it from `keymap.c` when the build
+**date** differs from the last one (QMK compares yy-mm-dd, not the time). Two builds
+on the same day keep the old keymap, hence step 4. Blanking the EEPROM also drops any
+VIA edits, so permanent changes go in `keymap.c`. To go back to the original 2021
+firmware, see [`backup/RESTORE.md`](backup/RESTORE.md).
 
 ## Layers
 
