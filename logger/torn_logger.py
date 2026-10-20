@@ -30,7 +30,7 @@ import traceback
 VID, PID = 0x7274, 0x0001
 RAW_USAGE_PAGE, RAW_USAGE = 0xFF60, 0x61
 CMD = 0xE0
-TAG_EVENT, TAG_HELLO = 0xA5, 0xA7
+TAG_EVENT, TAG_PAD, TAG_HELLO = 0xA5, 0xA6, 0xA7
 COLS = 12
 HEARTBEAT_S = 10     # firmware stops streaming after 120 s without one
 SAVE_S = 5
@@ -185,7 +185,7 @@ def split_args(body):
 
 def parse_chunk(c):
     """One 8-byte packet -> dict, or None if it isn't a valid logger packet."""
-    if len(c) != 8 or c[0] not in (TAG_EVENT, TAG_HELLO):
+    if len(c) != 8 or c[0] not in (TAG_EVENT, TAG_PAD, TAG_HELLO):
         return None
     if (sum(c[:7]) & 0xFF) ^ 0x5A != c[7]:
         return None
@@ -193,7 +193,7 @@ def parse_chunk(c):
     if c[0] == TAG_EVENT:
         p.update(pos=c[1] & 0x3F, pressed=bool(c[1] & 0x40), tap=bool(c[1] & 0x80),
                  state=c[2] & 0x3F, taphold=bool(c[2] & 0x40), time=c[3] | c[4] << 8)
-    else:
+    elif c[0] == TAG_HELLO:
         p.update(version=c[1], rows=c[2], cols=c[3])
     return p
 
@@ -419,7 +419,7 @@ def run(args):
                 last_drops = p["drops"]
                 if p["tag"] == TAG_HELLO:
                     st.update(firmware=f"logger v{p['version']}", last_hello=now)
-                else:
+                elif p["tag"] == TAG_EVENT:
                     c.event(p, now)
                     st["last_event"] = now
         except OSError as err:
@@ -675,7 +675,7 @@ def watch(args):
                     continue
                 if p["tag"] == TAG_HELLO:
                     print(f"  hello: logger v{p['version']}, matrix {p['rows']}x{p['cols']}, seq {p['seq']}, drops {p['drops']}")
-                else:
+                elif p["tag"] == TAG_EVENT:
                     layer = km.layer_of(p["pos"], p["state"])
                     kind = ("t" if p["tap"] else "h") if p["taphold"] else "k"
                     show = kind if p["pressed"] else "k"

@@ -14,10 +14,11 @@
 //   layer: bits 0-5 layer_state, bit 6 tap-hold key
 //   time:  record->event.time, the press/release time in ms (wraps every 65 s)
 //   seq:   +1 per packet, so the Mac can count lost ones; drops: queue overflows
-// After sending all queued packets we send one zero-length packet. A full (8-byte)
-// packet keeps the host's HID report open; the short packet ends it. So each burst
-// is delivered as its own report and framing never depends on a running count: a
-// lost packet or a USB reset costs at most the events in one report, never alignment.
+// macOS delivers a HID input report only once it fills to its 32-byte max (4 packets)
+// or ends on a short packet; empirically the short packet is not honoured here, so we
+// pad the current report with filler packets up to the 4-packet boundary. That flushes
+// the trailing 1-3 events of a burst at once. A lost packet only regroups packets into
+// reports; every packet is self-describing (seq + checksum), so the Mac never misreads.
 #include QMK_KEYBOARD_H
 #include <usbdrv/usbdrv.h>
 #include "keylog.h"
@@ -29,7 +30,7 @@
 
 _Static_assert(DYNAMIC_KEYMAP_LAYER_COUNT <= 6, "layer bits 6-7 are reused as flags in the packet");
 
-enum { TAG_EVENT = 0xA5, TAG_HELLO = 0xA7 };
+enum { TAG_EVENT = 0xA5, TAG_PAD = 0xA6, TAG_HELLO = 0xA7 };
 
 typedef struct {
     uint8_t  key;
@@ -40,8 +41,8 @@ typedef struct {
 static keylog_event_t queue[KEYLOG_QUEUE];
 static uint8_t        head, len;
 static uint8_t        seq, drops;
+static uint8_t        in_report; // packets put into the current 32-byte host report (0..3)
 static bool           on, hello;
-static bool           open; // a full packet is on the endpoint, report not yet closed
 static uint32_t       heartbeat;
 
 void keylog_record(uint16_t keycode, keyrecord_t *record) {
@@ -68,23 +69,14 @@ void housekeeping_task_user(void) {
     if (!usbConfiguration || !usbInterruptIsReady4()) {
         return;
     }
-    // Nothing left to send: if a report is still open, close it with a short packet.
-    // V-USB copies one byte even when len is 0, so the pointer must be valid, not NULL.
     uint8_t p[8] = {0};
-    if (!on || (!hello && !len)) {
-        if (open) {
-            usbSetInterrupt4(p, 0);
-            open = false;
-        }
-        return;
-    }
-    if (hello) {
+    if (on && hello) {
         hello = false;
         p[0]  = TAG_HELLO;
         p[1]  = KEYLOG_VERSION;
         p[2]  = MATRIX_ROWS;
         p[3]  = MATRIX_COLS;
-    } else {
+    } else if (on && len) {
         keylog_event_t *e = &queue[head];
         head              = (head + 1) % KEYLOG_QUEUE;
         len--;
@@ -93,6 +85,12 @@ void housekeeping_task_user(void) {
         p[2] = e->layer;
         p[3] = e->time & 0xFF;
         p[4] = e->time >> 8;
+    } else if (in_report) {
+        // Nothing to send but a report is half-filled: pad it up to 32 bytes so the
+        // host delivers the events already in it.
+        p[0] = TAG_PAD;
+    } else {
+        return;
     }
     p[5] = seq++;
     p[6] = drops;
@@ -101,7 +99,7 @@ void housekeeping_task_user(void) {
     }
     p[7] ^= 0x5A;
     usbSetInterrupt4(p, 8);
-    open = true;
+    in_report = (in_report + 1) & 3;
 }
 
 // [KEYLOG_CMD, 1] turns the stream on (and answers with a hello packet), [KEYLOG_CMD, 0]
