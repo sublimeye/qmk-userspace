@@ -10,4 +10,4 @@
 // RETRO_TAPPING stays off.
 
 // VIA stores 4 layers by default; this keymap has 7 (7 x 48 keys x 2 B = 672 B of the 1 KB EEPROM).
-#define DYNAMIC_KEYMAP_LAYER_COUNT 7
+#define DYNAMIC_KEYMAP_LAYER_COUNT 6
