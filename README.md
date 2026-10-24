@@ -35,7 +35,7 @@ firmware, see [`backup/RESTORE.md`](backup/RESTORE.md).
 
 | Layer | How | What |
 |---|---|---|
-| QWERTY | default | Home-row mods: Ctrl/Alt/Shift/Cmd on A S D F and J K L ;. Left of A (the Caps Lock spot): Caps Word. Right outer column: F12 (screenshot), ', emoji picker |
+| QWERTY | default | Home-row mods: Ctrl/Alt/Shift/Cmd on A S D F and J K L ;. Left of A (the Caps Lock spot): Caps Word; above it, F12 (screenshot). Right outer column: [ (х on the Russian layout), ', emoji picker |
 | SYM | hold Esc (left thumb) | Symbols |
 | NAV | hold Space (right thumb) | Arrows, word jumps, Home/PgUp/PgDn/End on Q W E R, deletes on N M , . / |
 | NUM | hold the language key (left inner thumb), or Esc + Space together | Numpad on the right hand |
@@ -89,6 +89,12 @@ raw HID channel open.
 - zsh: `bindkey '^[[3;3~' kill-word` (Option+Fwd-Delete deletes the next word).
 
 ## Changelog
+
+### v4.1 (2026-10-23)
+
+- `[` is back on the top-right key: on the Russian layout it types х.
+- Screenshot (F12) moved from there to the free top-left key, above Caps Word.
+- Flashed 2026-10-23.
 
 ### v4 (2026-10-20)
 

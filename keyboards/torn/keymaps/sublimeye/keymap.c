@@ -8,6 +8,7 @@
 // v3.3: Caps Word moved to the Caps Lock spot, left of A; top-left is free.
 // Language key: tap switches input source, hold for Num. Superwhisper (F1) moved next to Space; outer right thumb free.
 // v4: key usage stream for the Mac logger (keylog.c, logger/).
+// v4.1: [ is back top right (it types х on the Russian layout); screenshot (F12) moved top left.
 #include QMK_KEYBOARD_H
 #include "keylog.h"
 
@@ -20,7 +21,7 @@ enum torn_layers { _QWERTY, _SYM, _NAV, _NUM, _MEDIA, _FN };
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_QWERTY] = LAYOUT_split_3x6_4(
-    _______,          KC_Q,             KC_W,             KC_E,             KC_R,             KC_T,               KC_Y,             KC_U,             KC_I,             KC_O,             KC_P,             KC_F12,
+    KC_F12,           KC_Q,             KC_W,             KC_E,             KC_R,             KC_T,               KC_Y,             KC_U,             KC_I,             KC_O,             KC_P,             KC_LBRC,
     CW_TOGG,          LCTL_T(KC_A),     LALT_T(KC_S),     LSFT_T(KC_D),     LGUI_T(KC_F),     KC_G,               KC_H,             RGUI_T(KC_J),     RSFT_T(KC_K),     RALT_T(KC_L),     RCTL_T(KC_SCLN),  KC_QUOT,
     _______,          KC_Z,             KC_X,             KC_C,             KC_V,             KC_B,               KC_N,             KC_M,             KC_COMM,          KC_DOT,           KC_SLSH,          C(G(KC_SPC)),
                                         MO(_MEDIA),       HYPR(XXXXXXX),    LT(_SYM, KC_ESC), LANG_NUM,           MO(_FN),          LT(_NAV, KC_SPC), KC_F1,            _______
